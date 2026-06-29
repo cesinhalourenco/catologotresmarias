@@ -96,7 +96,7 @@ const storage = multer.diskStorage({
 const TIPOS_PERMITIDOS = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB por foto
   fileFilter: function (req, file, cb) {
     const ext = path.extname(file.originalname).toLowerCase();
     if (TIPOS_PERMITIDOS.includes(ext)) {
@@ -106,6 +106,9 @@ const upload = multer({
     }
   }
 });
+
+// cada peça tem até 4 fotos, enviadas no campo "fotos" (múltiplos arquivos)
+const uploadFotos = upload.fields([{ name: 'fotos', maxCount: 4 }]);
 
 // ============================================================
 // ROTAS
@@ -121,10 +124,11 @@ app.get('/api/produtos', (req, res) => {
   res.json(produtos);
 });
 
-// Cria uma nova peça (usado pelo admin)
-app.post('/api/produtos', upload.single('foto'), (req, res) => {
+// Cria uma nova peça (usado pelo admin) — exige exatamente 4 fotos
+app.post('/api/produtos', uploadFotos, (req, res) => {
   try {
     const { nome, preco, categoria } = req.body;
+    const arquivos = (req.files && req.files['fotos']) || [];
 
     if (!nome || !nome.trim()) {
       return res.status(400).json({ erro: 'O nome da peça é obrigatório.' });
@@ -136,8 +140,13 @@ app.post('/api/produtos', upload.single('foto'), (req, res) => {
     if (!categoria || !categoria.trim()) {
       return res.status(400).json({ erro: 'A categoria é obrigatória.' });
     }
+    if (arquivos.length !== 4) {
+      // remove qualquer arquivo que já tenha sido salvo no disco antes da validação falhar
+      arquivos.forEach(f => fs.unlink(f.path, () => {}));
+      return res.status(400).json({ erro: 'Envie exatamente 4 fotos para a peça.' });
+    }
 
-    const fotoUrl = req.file ? `/uploads/${req.file.filename}` : null;
+    const fotosUrls = arquivos.map(f => `/uploads/${f.filename}`);
 
     const data = lerBanco();
     const novo = {
@@ -145,7 +154,7 @@ app.post('/api/produtos', upload.single('foto'), (req, res) => {
       nome: nome.trim(),
       preco: precoNum,
       categoria: categoria.trim(),
-      foto: fotoUrl,
+      fotos: fotosUrls,
       criado_em: new Date().toISOString()
     };
     data.nextId += 1;
@@ -171,11 +180,12 @@ app.delete('/api/produtos/:id', (req, res) => {
 
   const existente = data.produtos[idx];
 
-  // remove o arquivo de foto do disco, se existir
-  if (existente.foto) {
-    const caminhoFoto = path.join(ROOT, existente.foto);
+  // remove todos os arquivos de foto do disco (campo novo "fotos", lista)
+  const listaFotos = existente.fotos || (existente.foto ? [existente.foto] : []);
+  listaFotos.forEach(f => {
+    const caminhoFoto = path.join(ROOT, f);
     fs.unlink(caminhoFoto, () => {}); // ignora erro se não existir
-  }
+  });
 
   data.produtos.splice(idx, 1);
   salvarBanco(data);
@@ -183,8 +193,11 @@ app.delete('/api/produtos/:id', (req, res) => {
   res.json({ ok: true });
 });
 
-// Edita uma peça existente (usado pelo admin)
-app.put('/api/produtos/:id', upload.single('foto'), (req, res) => {
+// Edita uma peça existente (usado pelo admin).
+// Pode enviar de 0 a 4 novas fotos no campo "fotos" — as fotos enviadas
+// substituem as fotos antigas NA MESMA POSIÇÃO (1ª enviada substitui a 1ª etc.).
+// Se não enviar nenhuma foto nova, mantém todas as 4 fotos atuais.
+app.put('/api/produtos/:id', uploadFotos, (req, res) => {
   const id = parseInt(req.params.id, 10);
   const data = lerBanco();
   const idx = data.produtos.findIndex(p => p.id === id);
@@ -197,13 +210,16 @@ app.put('/api/produtos/:id', upload.single('foto'), (req, res) => {
   const { nome, preco, categoria } = req.body;
   const precoNum = preco !== undefined ? parseFloat(preco) : existente.preco;
 
-  let fotoUrl = existente.foto;
-  if (req.file) {
-    // remove a foto antiga
-    if (existente.foto) {
-      fs.unlink(path.join(ROOT, existente.foto), () => {});
-    }
-    fotoUrl = `/uploads/${req.file.filename}`;
+  let fotosAtuais = existente.fotos || (existente.foto ? [existente.foto] : []);
+  const arquivosNovos = (req.files && req.files['fotos']) || [];
+
+  if (arquivosNovos.length > 0) {
+    // substitui as fotos antigas, na ordem, pelas novas enviadas
+    arquivosNovos.forEach((f, i) => {
+      const antiga = fotosAtuais[i];
+      if (antiga) fs.unlink(path.join(ROOT, antiga), () => {});
+      fotosAtuais[i] = `/uploads/${f.filename}`;
+    });
   }
 
   const atualizado = {
@@ -211,8 +227,9 @@ app.put('/api/produtos/:id', upload.single('foto'), (req, res) => {
     nome: nome !== undefined ? nome.trim() : existente.nome,
     preco: precoNum,
     categoria: categoria !== undefined ? categoria.trim() : existente.categoria,
-    foto: fotoUrl
+    fotos: fotosAtuais
   };
+  delete atualizado.foto; // remove campo antigo, se existia
 
   data.produtos[idx] = atualizado;
   salvarBanco(data);
@@ -227,24 +244,23 @@ app.get('/api/status', (req, res) => {
 });
 
 function formatarProduto(row, req) {
-  let fotoUrl = null;
-  if (row.foto) {
-    // Monta a URL completa da foto usando o endereço de onde a requisição
-    // chegou (req). Isso funciona tanto rodando local (localhost:3001)
-    // quanto hospedado (ex: https://seusite.onrender.com), e também quando
-    // o admin.html local busca dados da API hospedada (a foto continua
-    // apontando para o lugar certo, em vez de tentar carregar do localhost
-    // de quem está vendo a página).
-    const protocolo = req.protocol;
-    const host = req.get('host');
-    fotoUrl = `${protocolo}://${host}${row.foto}`;
-  }
+  const protocolo = req.protocol;
+  const host = req.get('host');
+
+  // retrocompatibilidade: peças antigas tinham um campo "foto" único.
+  // Peças novas têm "fotos" (lista de até 4).
+  const listaFotos = row.fotos || (row.foto ? [row.foto] : []);
+  const fotosCompletas = listaFotos.map(f => `${protocolo}://${host}${f}`);
+
   return {
     id: row.id,
     nome: row.nome,
     preco: row.preco,
     categoria: row.categoria,
-    foto: fotoUrl,
+    fotos: fotosCompletas,
+    // mantém "foto" (primeira da lista) por compatibilidade com qualquer
+    // código antigo que ainda espere esse campo
+    foto: fotosCompletas[0] || null,
     criado_em: row.criado_em
   };
 }
