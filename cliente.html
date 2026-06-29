@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Três Marias — Jóias em Prata</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #bdd6e8;
+    --bg-soft: #c9deee;
+    --bg-deep: #a9c6dd;
+    --card: #ffffff;
+    --card-border: #9fbed4;
+    --ink: #4a5560;
+    --ink-soft: #6c7a87;
+    --ink-faint: #8fa0ad;
+    --gold: #8a7458;
+    --gold-dim: #a6906f;
+    --radius: 2px;
+  }
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  body{
+    margin:0; background: var(--bg); color: var(--ink);
+    font-family:'Jost', sans-serif; -webkit-font-smoothing: antialiased; min-height:100vh;
+  }
+  body::before{
+    content:""; position: fixed; inset:0; pointer-events:none;
+    background-image:
+      radial-gradient(circle at 15% 0%, rgba(255,255,255,0.45), transparent 45%),
+      radial-gradient(circle at 90% 90%, rgba(255,255,255,0.25), transparent 50%);
+    z-index:0;
+  }
+  h1,h2,h3,.display{ font-family:'Cormorant Garamond', serif; font-weight:500; letter-spacing:0.01em; }
+
+  header{
+    position:relative; z-index:1; padding: 56px 24px 36px; text-align:center;
+    border-bottom: 1px solid var(--card-border);
+  }
+  header .brand-name{
+    font-family:'Cormorant Garamond', serif; font-weight:500;
+    font-size: clamp(30px, 5vw, 42px); letter-spacing: 0.05em; color: var(--ink);
+    margin: 4px 0 2px;
+  }
+  header .brand-sub{
+    font-size: 11px; letter-spacing:0.28em; text-transform:uppercase;
+    color: var(--gold); margin-bottom: 26px; font-weight:500;
+  }
+
+  header .eyebrow{ font-size: 11px; letter-spacing:0.22em; text-transform:uppercase; color: var(--gold); margin-bottom:12px; font-weight:500; }
+  header h1{ font-size: clamp(28px,4.6vw,46px); margin:0; color: var(--ink); line-height:1.18; max-width: 640px; margin-left:auto; margin-right:auto; }
+  header p.sub{ margin: 16px auto 0; max-width: 480px; color: var(--ink-soft); font-size: 15px; line-height: 1.6; }
+
+  .divider-orn{ display:flex; align-items:center; justify-content:center; gap:10px; margin: 18px 0 0; }
+  .divider-orn .ln{ height:1px; width:34px; background: var(--card-border); }
+  .divider-orn .dot{ width:4px; height:4px; border-radius:50%; background: var(--gold); transform: rotate(45deg); }
+
+  .toolbar{
+    position: sticky; top:0; z-index:10;
+    background: rgba(189,214,232,0.88); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--card-border);
+    padding: 14px 24px; display:flex; gap:12px; align-items:center; justify-content:center; flex-wrap:wrap;
+  }
+  .filter-pill{
+    background: transparent; border: 1px solid var(--card-border); color: var(--ink-soft);
+    padding: 8px 18px; border-radius: 999px; font-family:'Jost'; font-size:13px; letter-spacing:0.03em;
+    cursor:pointer; transition: all .2s ease; white-space:nowrap;
+  }
+  .filter-pill:hover{ border-color: var(--gold); color: var(--ink); }
+  .filter-pill.active{ background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  main{ position:relative; z-index:1; max-width: 1180px; margin:0 auto; padding: 40px 24px 80px; min-height: 50vh; }
+
+  .category-block{ margin-bottom: 52px; }
+  .category-block:last-child{ margin-bottom:0; }
+  .category-title{ display:flex; align-items:baseline; gap:16px; margin-bottom:22px; }
+  .category-title h2{ font-size:26px; color: var(--ink); margin:0; white-space:nowrap; }
+  .category-title .line{ flex:1; height:1px; background: var(--card-border); }
+  .category-title .count{ font-size:12px; color: var(--ink-faint); letter-spacing:0.05em; }
+
+  .grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 22px; }
+
+  .card{
+    background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius);
+    overflow:hidden; position:relative; transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+    box-shadow: 0 1px 3px rgba(74,85,96,0.06);
+  }
+  .card:hover{ border-color: var(--gold-dim); transform: translateY(-3px); box-shadow: 0 10px 24px rgba(74,85,96,0.12); }
+  .card::after{
+    content:""; position:absolute; inset:0; border-radius: var(--radius);
+    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%);
+    background-size: 220% 220%; background-position: 120% 0; opacity:0; transition: opacity .2s ease; pointer-events:none;
+  }
+  .card:hover::after{ opacity:1; animation: glint 1.1s ease forwards; }
+  @keyframes glint{ from{background-position:120% 0;} to{background-position:-20% 0;} }
+  @media (prefers-reduced-motion: reduce){ .card:hover::after{animation:none;opacity:0;} .card:hover{transform:none;} }
+
+  .card .imgwrap{ width:100%; aspect-ratio:1/1; background: var(--bg-soft); display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .card .imgwrap img{ width:100%; height:100%; object-fit:cover; }
+  .card .imgwrap .placeholder{ color: var(--ink-faint); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; }
+
+  .card .body{ padding: 16px 16px 18px; }
+  .card .cat-tag{ font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color: var(--gold); margin-bottom:6px; display:block; }
+  .card h3{ font-size:19px; margin:0 0 8px; color: var(--ink); line-height:1.25; }
+  .card .price{ font-family:'Jost'; font-size:18px; font-weight:500; color: var(--ink); letter-spacing:0.01em; }
+  .card .price small{ font-size:11px; color: var(--ink-faint); font-weight:400; margin-right:3px; }
+
+  .empty{ text-align:center; padding: 90px 24px; color: var(--ink-soft); }
+  .empty .display{ font-size:28px; color: var(--ink); margin-bottom:10px; }
+  .empty p{ font-size:14px; max-width:380px; margin:0 auto; line-height:1.6; }
+
+  .skeleton-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap:22px; }
+  .skeleton-card{ background: var(--card); border:1px solid var(--card-border); border-radius: var(--radius); overflow:hidden; }
+  .skeleton-card .imgwrap{ width:100%; aspect-ratio:1/1; background: linear-gradient(100deg, var(--bg-soft) 30%, var(--card-border) 50%, var(--bg-soft) 70%); background-size:200% 100%; animation: pulse 1.4s ease-in-out infinite; }
+  .skeleton-card .body{ padding:16px; }
+  .skeleton-card .line{ height:10px; border-radius:2px; background: var(--card-border); margin-bottom:8px; width:70%; }
+  @keyframes pulse{ 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
+
+  footer{
+    text-align:center; padding: 30px 24px 40px; color: var(--ink-faint); font-size:12px;
+    letter-spacing:0.06em; border-top: 1px solid var(--card-border); position:relative; z-index:1;
+  }
+  footer .foot-brand{ font-family:'Cormorant Garamond', serif; color: var(--ink-soft); font-size:14px; letter-spacing:0.08em; margin-bottom:4px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand-name">Três Marias</div>
+  <div class="brand-sub">Jóias em Prata</div>
+
+  <div class="divider-orn"><span class="ln"></span><span class="dot"></span><span class="ln"></span></div>
+
+  <h1 style="margin-top:22px;">Peças que contam histórias —<br>encontre a sua entre <span style="color:var(--gold); font-style:italic;">pratas</span> selecionadas a dedo.</h1>
+  <p class="sub">Cada detalhe pensado para iluminar momentos. Preço e disponibilidade sempre atualizados.</p>
+</header>
+
+<div class="toolbar" id="toolbar"></div>
+
+<main id="main">
+  <div class="skeleton-grid" id="skeleton">
+    <div class="skeleton-card"><div class="imgwrap"></div><div class="body"><div class="line" style="width:40%"></div><div class="line" style="width:80%"></div><div class="line" style="width:30%"></div></div></div>
+    <div class="skeleton-card"><div class="imgwrap"></div><div class="body"><div class="line" style="width:40%"></div><div class="line" style="width:80%"></div><div class="line" style="width:30%"></div></div></div>
+    <div class="skeleton-card"><div class="imgwrap"></div><div class="body"><div class="line" style="width:40%"></div><div class="line" style="width:80%"></div><div class="line" style="width:30%"></div></div></div>
+  </div>
+</main>
+
+<footer>
+  <div class="foot-brand">Três Marias</div>
+  Catálogo atualizado em tempo real
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  // URL relativa: funciona automaticamente tanto rodando local
+  // (http://localhost:3001) quanto hospedado (ex: https://seusite.onrender.com),
+  // porque "/api" se completa com o endereço de onde esta página foi aberta.
+  var API_URL = "/api";
+  var CATEGORY_ORDER = ["Anéis","Colares","Brincos","Pulseiras","Pingentes","Outros"];
+  var products = [];
+  var activeFilter = "Todos";
+  var firstLoad = true;
+
+  function escapeHtml(str){
+    var d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+  function fmtPrice(v){
+    return Number(v).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+
+  async function fetchProducts(){
+    var res = await fetch(API_URL + '/produtos');
+    if(!res.ok) throw new Error('Falha ao buscar produtos');
+    return res.json();
+  }
+
+  function renderToolbar(){
+    var toolbar = document.getElementById('toolbar');
+    toolbar.innerHTML = '';
+    var cats = ["Todos"];
+    CATEGORY_ORDER.forEach(function(c){
+      if(products.some(function(p){ return p.categoria === c; })) cats.push(c);
+    });
+    cats.forEach(function(c){
+      var btn = document.createElement('button');
+      btn.className = 'filter-pill' + (c === activeFilter ? ' active' : '');
+      btn.type = 'button';
+      btn.textContent = c;
+      btn.addEventListener('click', function(){
+        activeFilter = c;
+        renderToolbar();
+        renderCatalog();
+      });
+      toolbar.appendChild(btn);
+    });
+  }
+
+  function renderCatalog(){
+    var main = document.getElementById('main');
+    main.innerHTML = '';
+
+    var visible = products.filter(function(p){
+      return activeFilter === 'Todos' || p.categoria === activeFilter;
+    });
+
+    if(products.length === 0){
+      main.innerHTML =
+        '<div class="empty"><div class="display">A vitrine está vazia</div>' +
+        '<p>Em breve novas peças serão adicionadas ao catálogo.</p></div>';
+      return;
+    }
+
+    if(visible.length === 0){
+      main.innerHTML =
+        '<div class="empty"><div class="display">Nada em "' + escapeHtml(activeFilter) + '"</div>' +
+        '<p>Ainda não há peças cadastradas nessa categoria.</p></div>';
+      return;
+    }
+
+    var groups = {};
+    visible.forEach(function(p){
+      if(!groups[p.categoria]) groups[p.categoria] = [];
+      groups[p.categoria].push(p);
+    });
+
+    var orderedCats = CATEGORY_ORDER.filter(function(c){ return groups[c]; });
+
+    orderedCats.forEach(function(cat){
+      var block = document.createElement('section');
+      block.className = 'category-block';
+      var title = document.createElement('div');
+      title.className = 'category-title';
+      title.innerHTML =
+        '<h2>' + escapeHtml(cat) + '</h2><div class="line"></div>' +
+        '<span class="count">' + groups[cat].length + (groups[cat].length===1?' peça':' peças') + '</span>';
+      block.appendChild(title);
+
+      var grid = document.createElement('div');
+      grid.className = 'grid';
+      groups[cat].forEach(function(p){
+        var card = document.createElement('article');
+        card.className = 'card';
+        card.innerHTML =
+          '<div class="imgwrap">' +
+            (p.foto ? '<img src="'+p.foto+'" alt="'+escapeHtml(p.nome)+'" loading="lazy">' : '<span class="placeholder">Sem foto</span>') +
+          '</div>' +
+          '<div class="body">' +
+            '<span class="cat-tag">'+escapeHtml(p.categoria)+'</span>' +
+            '<h3>'+escapeHtml(p.nome)+'</h3>' +
+            '<div class="price"><small>R$</small>'+fmtPrice(p.preco)+'</div>' +
+          '</div>';
+        grid.appendChild(card);
+      });
+      block.appendChild(grid);
+      main.appendChild(block);
+    });
+  }
+
+  function renderError(){
+    var main = document.getElementById('main');
+    main.innerHTML =
+      '<div class="empty"><div class="display">Catálogo indisponível</div>' +
+      '<p>Não foi possível conectar à loja agora. Tente novamente em alguns instantes.</p></div>';
+    document.getElementById('toolbar').innerHTML = '';
+  }
+
+  async function refresh(){
+    try{
+      var data = await fetchProducts();
+      products = data;
+      renderToolbar();
+      renderCatalog();
+    }catch(e){
+      if(firstLoad) renderError();
+      // se já tinha carregado antes, mantém o que estava na tela em vez de quebrar
+    }
+    firstLoad = false;
+  }
+
+  refresh();
+  // atualiza sozinho a cada 5s para refletir novas peças cadastradas pelo admin
+  setInterval(refresh, 5000);
+})();
+</script>
+
+</body>
+</html>
