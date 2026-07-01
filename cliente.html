@@ -129,8 +129,19 @@
   .card .body{ padding: 16px 16px 18px; }
   .card .cat-tag{ font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color: var(--gold); margin-bottom:6px; display:block; }
   .card h3{ font-size:19px; margin:0 0 8px; color: var(--ink); line-height:1.25; }
-  .card .price{ font-family:'Jost'; font-size:18px; font-weight:500; color: var(--ink); letter-spacing:0.01em; }
+  .card .price{ font-family:'Jost'; font-size:18px; font-weight:500; color: var(--ink); letter-spacing:0.01em; margin-bottom: 12px; }
   .card .price small{ font-size:11px; color: var(--ink-faint); font-weight:400; margin-right:3px; }
+
+  .btn-whatsapp{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; padding: 11px 14px; border-radius: var(--radius);
+    background: #25d366; color: #fff; border:none; cursor:pointer;
+    font-family:'Jost'; font-size:13px; font-weight:500; letter-spacing:0.03em;
+    text-decoration:none; transition: background .2s ease, transform .15s ease;
+  }
+  .btn-whatsapp:hover{ background: #1ebe5d; transform: translateY(-1px); }
+  .btn-whatsapp:active{ transform: scale(0.98); }
+  .btn-whatsapp svg{ flex-shrink:0; }
 
   .empty{ text-align:center; padding: 90px 24px; color: var(--ink-soft); }
   .empty .display{ font-size:28px; color: var(--ink); margin-bottom:10px; }
@@ -226,6 +237,17 @@
     });
   }
 
+  var WHATSAPP = '5563999346140';
+
+  function gerarLinkWhatsApp(nome, preco, categoria){
+    var msg = 'Olá! Vi o catálogo das *Três Marias* e tenho interesse na peça:\n\n'
+      + '*' + nome + '*\n'
+      + 'Categoria: ' + categoria + '\n'
+      + 'Valor: R$ ' + preco + '\n\n'
+      + 'Poderia me dar mais informações? 😊';
+    return 'https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent(msg);
+  }
+
   var carouselPositions = {}; // guarda em qual foto cada peça estava parada, para não resetar a cada atualização automática
 
   function renderCatalog(){
@@ -295,6 +317,8 @@
             '</div>';
         }
 
+        var linkWpp = gerarLinkWhatsApp(p.nome, fmtPrice(p.preco), p.categoria);
+
         card.innerHTML =
           '<div class="imgwrap" data-current="'+posInicial+'" data-total="'+fotos.length+'">' +
             imgsHtml + arrowsHtml + dotsHtml +
@@ -303,6 +327,10 @@
             '<span class="cat-tag">'+escapeHtml(p.categoria)+'</span>' +
             '<h3>'+escapeHtml(p.nome)+'</h3>' +
             '<div class="price"><small>R$</small>'+fmtPrice(p.preco)+'</div>' +
+            '<a href="'+linkWpp+'" target="_blank" rel="noopener noreferrer" class="btn-whatsapp">' +
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.115.549 4.1 1.508 5.83L.057 23.25a.75.75 0 0 0 .916.919l5.487-1.438A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.696 9.696 0 0 1-4.953-1.355l-.355-.211-3.676.963.981-3.584-.232-.369A9.696 9.696 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/></svg>' +
+              'Pedir pelo WhatsApp' +
+            '</a>' +
           '</div>';
 
         grid.appendChild(card);
