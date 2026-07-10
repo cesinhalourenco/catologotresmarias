@@ -698,14 +698,20 @@ function renderError(){
 async function refresh(){
   try{
     var data = await fetchProducts();
-    products = data;
-    renderToolbar();
-    renderCatalog();
+    // Só re-renderiza se os dados realmente mudaram (compara por ID e quantidade)
+    var idsNovos = data.map(function(p){return p.id;}).join(',');
+    var idsAtuais = products.map(function(p){return p.id;}).join(',');
+    if(idsNovos !== idsAtuais || firstLoad){
+      products = data;
+      renderToolbar();
+      renderCatalog();
+    }
   }catch(e){ if(firstLoad) renderError(); }
   firstLoad = false;
 }
 refresh();
-setInterval(refresh,5000);
+// Reduz frequência para 30s e só atualiza se houver mudança real
+setInterval(refresh, 30000);
 })();
 
 function copiarCupom(el){
