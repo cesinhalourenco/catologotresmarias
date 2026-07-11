@@ -89,6 +89,7 @@ nav{
   text-align:center;overflow:hidden;
   background:linear-gradient(160deg,#d4e8f5 0%,#bdd6e8 50%,#a4c2d9 100%);
 }
+@media(max-width:700px){.hero{min-height:70vh;}}
 .hero-particles{position:absolute;inset:0;pointer-events:none;}
 .hero-particles span{
   position:absolute;border-radius:50%;
@@ -163,6 +164,10 @@ nav{
   border-bottom:1px solid var(--card-border);
   padding:14px 24px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;
 }
+@media(max-width:700px){
+  #catalogo{scroll-margin-top:64px;}
+  .toolbar{top:64px;}
+}
 .filter-pill{
   background:transparent;border:1px solid var(--card-border);color:var(--ink-soft);
   padding:7px 20px;border-radius:999px;font-family:'Jost';font-size:12px;letter-spacing:.04em;
@@ -204,17 +209,18 @@ main{max-width:1200px;margin:0 auto;padding:48px 24px 80px;min-height:40vh;}
 
 .card .carousel-arrow{
   position:absolute;top:50%;transform:translateY(-50%);z-index:3;
-  width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;
-  background:rgba(255,255,255,.92);color:var(--ink);font-size:16px;
+  width:36px;height:36px;border-radius:4px;border:1px solid rgba(255,255,255,.7);cursor:pointer;
+  background:rgba(255,255,255,.88);color:var(--ink);font-size:18px;
   display:flex;align-items:center;justify-content:center;
-  opacity:0;transition:opacity .2s,transform .2s;
-  box-shadow:0 2px 8px rgba(74,85,96,.15);
+  opacity:0;transition:opacity .25s,background .2s,border-color .2s;
+  box-shadow:0 2px 10px rgba(74,85,96,.18);backdrop-filter:blur(4px);
 }
 .card:hover .carousel-arrow{opacity:1;}
-.card .carousel-arrow:hover{transform:translateY(-50%) scale(1.1);}
+.card .carousel-arrow:hover{background:#fff;border-color:rgba(255,255,255,1);}
 .card .carousel-arrow.prev{left:10px;}
 .card .carousel-arrow.next{right:10px;}
-@media(hover:none){.card .carousel-arrow{opacity:1;}}
+/* no mobile as setas ficam sempre visíveis */
+@media(hover:none){.card .carousel-arrow{opacity:.85;width:32px;height:32px;font-size:16px;}}
 
 .card .carousel-dots{position:absolute;bottom:10px;left:0;right:0;z-index:3;display:flex;justify-content:center;gap:5px;}
 .card .carousel-dots .dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.6);border:1px solid rgba(74,85,96,.2);transition:background .2s,transform .2s;}
@@ -415,7 +421,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.55);padding:56px 24px 32px;
     <div class="nav-right">
       <a href="mailto:tresmariaspts@gmail.com" class="hide-mobile">✉ tresmariaspts@gmail.com</a>
       <a href="https://www.instagram.com/tresmariaspts" target="_blank" rel="noopener" class="hide-mobile">📷 Instagram</a>
-      <a href="https://wa.me/5563992082522" target="_blank" rel="noopener" class="nav-wpp">💬 WhatsApp</a>
+      <a href="https://wa.me/5563992082522?text=Ol%C3%A1%2C%20gostaria%20de%20falar%20com%20a%20loja!" target="_blank" rel="noopener" class="nav-wpp">💬 WhatsApp</a>
     </div>
   </div>
   <div class="nav-cats">
@@ -439,7 +445,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.55);padding:56px 24px 32px;
     <p class="hero-desc">Peças em prata 925 selecionadas com cuidado para mulheres que expressam sua beleza com autenticidade. Entregamos para todo o Brasil.</p>
     <div class="hero-btns">
       <a href="#catalogo" class="btn-prim">Ver coleção</a>
-      <a href="https://wa.me/5563992082522" target="_blank" rel="noopener" class="btn-sec">Falar conosco</a>
+      <a href="https://wa.me/5563992082522?text=Ol%C3%A1%2C%20gostaria%20de%20falar%20com%20a%20loja!" target="_blank" rel="noopener" class="btn-sec">Falar conosco</a>
     </div>
   </div>
   <div class="hero-scroll"><div class="hero-scroll-line"></div>rolar</div>
@@ -666,7 +672,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.55);padding:56px 24px 32px;
       <p>Jóias em prata 925 selecionadas com cuidado para mulheres que valorizam elegância e qualidade.</p>
       <div class="foot-social">
         <a href="https://www.instagram.com/tresmariaspts" target="_blank" rel="noopener" title="Instagram">📷</a>
-        <a href="https://wa.me/5563992082522" target="_blank" rel="noopener" title="WhatsApp">💬</a>
+        <a href="https://wa.me/5563992082522?text=Ol%C3%A1%2C%20gostaria%20de%20falar%20com%20a%20loja!" target="_blank" rel="noopener" title="WhatsApp">💬</a>
         <a href="mailto:tresmariaspts@gmail.com" title="E-mail">✉</a>
       </div>
     </div>
@@ -681,7 +687,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.55);padding:56px 24px 32px;
     </div>
     <div class="foot-col">
       <h4>Atendimento</h4>
-      <a href="https://wa.me/5563992082522" target="_blank" rel="noopener">💬 WhatsApp</a>
+      <a href="https://wa.me/5563992082522?text=Ol%C3%A1%2C%20gostaria%20de%20falar%20com%20a%20loja!" target="_blank" rel="noopener">💬 WhatsApp</a>
       <a href="mailto:tresmariaspts@gmail.com">✉ tresmariaspts@gmail.com</a>
       <a href="https://www.instagram.com/tresmariaspts" target="_blank" rel="noopener">📷 @tresmariaspts</a>
       <a href="#faq" style="margin-top:12px;">Perguntas frequentes</a>
@@ -695,7 +701,7 @@ footer{background:var(--ink);color:rgba(255,255,255,.55);padding:56px 24px 32px;
 </footer>
 
 <!-- WPP FLOAT -->
-<a href="https://wa.me/5563992082522" target="_blank" rel="noopener" class="wpp-float" title="Fale conosco">
+<a href="https://wa.me/5563992082522?text=Ol%C3%A1%2C%20gostaria%20de%20falar%20com%20a%20loja!" target="_blank" rel="noopener" class="wpp-float" title="Fale conosco">
   <svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.115.549 4.1 1.508 5.83L.057 23.25a.75.75 0 0 0 .916.919l5.487-1.438A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.696 9.696 0 0 1-4.953-1.355l-.355-.211-3.676.963.981-3.584-.232-.369A9.696 9.696 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/></svg>
 </a>
 
@@ -846,16 +852,72 @@ function renderCatalog(){
 function setupCarousel(iw,pid){
   var total=parseInt(iw.getAttribute('data-total'),10);
   var imgs=iw.querySelectorAll('img');var dots=iw.querySelectorAll('.carousel-dots .dot');
+  var card=iw.closest('.card');
+
   function goTo(idx){
     idx=((idx%total)+total)%total;
     iw.setAttribute('data-current',idx);carouselPositions[pid]=idx;
     imgs.forEach(function(img){img.classList.toggle('is-active',parseInt(img.getAttribute('data-idx'),10)===idx);});
     dots.forEach(function(d){d.classList.toggle('is-active',parseInt(d.getAttribute('data-idx'),10)===idx);});
   }
-  var prev=iw.querySelector('.carousel-arrow.prev');var next=iw.querySelector('.carousel-arrow.next');
-  if(prev)prev.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();goTo(parseInt(iw.getAttribute('data-current'),10)-1);});
-  if(next)next.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();goTo(parseInt(iw.getAttribute('data-current'),10)+1);});
-  dots.forEach(function(d){d.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();goTo(parseInt(d.getAttribute('data-idx'),10));});});
+
+  function scrollToNextCard(){
+    // pega o próximo card irmão dentro do mesmo grid
+    var nextCard=card.nextElementSibling;
+    if(nextCard && nextCard.classList.contains('card')){
+      var offset=nextCard.getBoundingClientRect().top+window.pageYOffset-100;
+      window.scrollTo({top:offset,behavior:'smooth'});
+      // já mostra a primeira foto do próximo card
+      var nextIw=nextCard.querySelector('.imgwrap');
+      if(nextIw){
+        var nextImgs=nextCard.querySelectorAll('.imgwrap img');
+        var nextDots=nextCard.querySelectorAll('.carousel-dots .dot');
+        nextImgs.forEach(function(img){img.classList.toggle('is-active',img.getAttribute('data-idx')==='0');});
+        nextDots.forEach(function(d){d.classList.toggle('is-active',d.getAttribute('data-idx')==='0');});
+        nextIw.setAttribute('data-current','0');
+      }
+    }
+  }
+
+  function scrollToPrevCard(){
+    var prevCard=card.previousElementSibling;
+    if(prevCard && prevCard.classList.contains('card')){
+      var offset=prevCard.getBoundingClientRect().top+window.pageYOffset-100;
+      window.scrollTo({top:offset,behavior:'smooth'});
+    }
+  }
+
+  var prev=iw.querySelector('.carousel-arrow.prev');
+  var next=iw.querySelector('.carousel-arrow.next');
+
+  if(prev) prev.addEventListener('click',function(e){
+    e.preventDefault();e.stopPropagation();
+    var cur=parseInt(iw.getAttribute('data-current'),10);
+    if(cur===0){
+      // já está na primeira foto — rola para o card anterior
+      scrollToPrevCard();
+    } else {
+      goTo(cur-1);
+    }
+  });
+
+  if(next) next.addEventListener('click',function(e){
+    e.preventDefault();e.stopPropagation();
+    var cur=parseInt(iw.getAttribute('data-current'),10);
+    if(cur===total-1){
+      // já está na última foto — rola para o próximo card
+      scrollToNextCard();
+    } else {
+      goTo(cur+1);
+    }
+  });
+
+  dots.forEach(function(d){
+    d.addEventListener('click',function(e){
+      e.preventDefault();e.stopPropagation();
+      goTo(parseInt(d.getAttribute('data-idx'),10));
+    });
+  });
 }
 function renderError(){
   document.getElementById('main').innerHTML='<div class="empty"><div class="display">Catálogo indisponível</div><p>Não foi possível conectar à loja agora. Tente novamente em alguns instantes.</p></div>';
