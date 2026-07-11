@@ -176,54 +176,47 @@ nav{
 .filter-pill:hover{border-color:var(--gold);color:var(--ink);}
 .filter-pill.active{background:var(--ink);color:#fff;border-color:var(--ink);}
 
-main{max-width:100%;margin:0;padding:48px 0 80px;min-height:40vh;}
-.category-block{margin-bottom:52px;}
+main{max-width:1400px;margin:0 auto;padding:48px 32px 80px;min-height:40vh;}
+.category-block{margin-bottom:60px;}
 .category-title{
   display:flex;align-items:center;justify-content:space-between;
-  gap:18px;margin-bottom:20px;padding:0 32px;
+  gap:18px;margin-bottom:24px;
 }
 .category-title h2{font-size:26px;color:var(--ink);margin:0;white-space:nowrap;}
 .category-title .count{font-size:11px;color:var(--ink-faint);letter-spacing:.06em;white-space:nowrap;}
 
-/* ===== CARROSSEL HORIZONTAL ===== */
+/* ===== CARROSSEL DESKTOP ===== */
 .carousel-wrap{position:relative;}
-.carousel-track-outer{
-  overflow:hidden;
-  /* padding lateral para ver que tem mais cards */
-  padding:0 32px;
-}
+.carousel-track-outer{overflow:hidden;}
 .carousel-track{
-  display:flex;
-  gap:0;
-  transition:transform .4s cubic-bezier(.4,0,.2,1);
-  /* borda esquerda do grid */
-  border-left:1px solid var(--card-border);
+  display:grid;
+  /* 4 colunas iguais */
+  grid-template-columns:repeat(4,1fr);
+  gap:1px;background:var(--card-border);
+  transition:none; /* desktop usa grid, não transform */
 }
 
-/* seta de navegação do carrossel de categoria */
+/* setas de navegação */
 .cat-arrow{
-  position:absolute;top:50%;transform:translateY(-50%);z-index:10;
+  position:absolute;top:40%;transform:translateY(-50%);z-index:10;
   width:44px;height:44px;border-radius:50%;cursor:pointer;
   background:#fff;border:1px solid var(--card-border);
   color:var(--ink);font-size:20px;
   display:flex;align-items:center;justify-content:center;
   box-shadow:0 4px 16px rgba(74,85,96,.15);
-  transition:box-shadow .2s,transform .2s,opacity .2s;opacity:1;
+  transition:box-shadow .2s,transform .2s,opacity .3s;
 }
 .cat-arrow:hover{box-shadow:0 6px 24px rgba(74,85,96,.22);transform:translateY(-50%) scale(1.06);}
 .cat-arrow.hidden{opacity:0;pointer-events:none;}
-.cat-arrow-prev{left:6px;}
-.cat-arrow-next{right:6px;}
+.cat-arrow-prev{left:-22px;}
+.cat-arrow-next{right:-22px;}
 
-/* ===== CARD ===== */
+/* ===== CARD desktop ===== */
 .card{
-  background:var(--card);
-  position:relative;flex:0 0 280px;
-  border-right:1px solid var(--card-border);
-  border-top:1px solid var(--card-border);
-  border-bottom:1px solid var(--card-border);
+  background:var(--card);position:relative;
   transition:box-shadow .3s;
 }
+.card.hidden-card{display:none;}
 .card:hover{box-shadow:0 12px 36px rgba(74,85,96,.14);z-index:2;}
 .card::before{
   content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
@@ -234,24 +227,32 @@ main{max-width:100%;margin:0;padding:48px 0 80px;min-height:40vh;}
 @keyframes glint{from{background-position:120% 0;}to{background-position:-20% 0;}}
 @media(prefers-reduced-motion:reduce){.card:hover::before{animation:none;opacity:0;}}
 
-/* ===== MOBILE ===== */
+/* ===== MOBILE: 2 colunas, sem carrossel, scroll direto ===== */
 @media(max-width:700px){
-  main{padding:24px 0 60px;}
-  .category-block{margin-bottom:36px;}
+  main{padding:20px 0 60px;}
+  .category-block{margin-bottom:40px;}
   .category-title{padding:0 14px;margin-bottom:14px;}
   .category-title h2{font-size:20px;}
-  .carousel-track-outer{padding:0 14px;}
-  .card{flex:0 0 calc(50vw - 18px);}
-  .card .body{padding:10px 10px 12px;}
+
+  /* no mobile: grid simples 2 colunas, sem carrossel */
+  .carousel-wrap{position:static;}
+  .carousel-track-outer{overflow:visible;}
+  .carousel-track{
+    grid-template-columns:1fr 1fr;
+    transition:none;
+  }
+  /* esconde setas no mobile — não precisa, é scroll direto */
+  .cat-arrow{display:none;}
+  /* todos os cards visíveis no mobile */
+  .card.hidden-card{display:block!important;}
+
+  .card .body{padding:10px 10px 14px;}
   .card .cat-tag{font-size:8px;letter-spacing:.12em;margin-bottom:3px;}
-  .card h3{font-size:13px;margin-bottom:5px;line-height:1.2;}
-  .card .price{font-size:15px;margin-bottom:8px;}
-  .card .price small{font-size:9px;}
-  .btn-whatsapp{padding:9px 8px;font-size:9px;letter-spacing:.06em;gap:5px;}
+  .card h3{font-size:14px;margin-bottom:6px;line-height:1.25;}
+  .card .price{font-size:16px;margin-bottom:10px;}
+  .card .price small{font-size:10px;}
+  .btn-whatsapp{padding:10px 8px;font-size:10px;letter-spacing:.06em;gap:5px;border-radius:999px;}
   .btn-whatsapp .wpp-ico{width:12px;height:12px;font-size:7px;}
-  .cat-arrow{width:34px;height:34px;font-size:16px;}
-  .cat-arrow-prev{left:2px;}
-  .cat-arrow-next{right:2px;}
   .filter-pill{padding:6px 13px;font-size:11px;}
 }
 
@@ -936,62 +937,43 @@ function renderCatalog(){
     setTimeout(function(){ro.observe(block);},10);
 
     // ===== lógica do carrossel de categoria =====
-    setupCatCarousel(track, btnPrev, btnNext, outer);
+    setupCatCarousel(track, btnPrev, btnNext);
   });
 }
 
-function setupCatCarousel(track, btnPrev, btnNext, outer){
-  var currentIdx = 0;
+function setupCatCarousel(track, btnPrev, btnNext){
+  var PER_PAGE = 4;
+  var currentPage = 0;
+  var cards = Array.from(track.querySelectorAll('.card'));
+  var totalPages = Math.ceil(cards.length / PER_PAGE);
 
-  function getCardWidth(){
-    var firstCard = track.querySelector('.card');
-    if(!firstCard) return 280;
-    return firstCard.offsetWidth;
-  }
-
-  function getTotalCards(){ return track.querySelectorAll('.card').length; }
-
-  function getVisibleCount(){
-    return Math.round(outer.offsetWidth / getCardWidth());
-  }
+  function isMobile(){ return window.innerWidth <= 700; }
 
   function update(){
-    var cardW = getCardWidth();
-    track.style.transform = 'translateX(-'+(currentIdx * cardW)+'px)';
-    var total = getTotalCards();
-    var visible = getVisibleCount();
-    btnPrev.classList.toggle('hidden', currentIdx === 0);
-    btnNext.classList.toggle('hidden', currentIdx >= total - visible);
+    if(isMobile()){
+      // no mobile mostra todos — sem paginação
+      cards.forEach(function(c){ c.classList.remove('hidden-card'); });
+      btnPrev.classList.add('hidden');
+      btnNext.classList.add('hidden');
+      return;
+    }
+    // desktop: mostra só os 4 da página atual
+    cards.forEach(function(c,i){
+      var page = Math.floor(i / PER_PAGE);
+      c.classList.toggle('hidden-card', page !== currentPage);
+    });
+    btnPrev.classList.toggle('hidden', currentPage === 0);
+    btnNext.classList.toggle('hidden', currentPage >= totalPages - 1);
   }
 
   btnPrev.addEventListener('click', function(){
-    if(currentIdx > 0){ currentIdx--; update(); }
+    if(currentPage > 0){ currentPage--; update(); }
   });
-
   btnNext.addEventListener('click', function(){
-    var total = getTotalCards();
-    var visible = getVisibleCount();
-    if(currentIdx < total - visible){ currentIdx++; update(); }
+    if(currentPage < totalPages - 1){ currentPage++; update(); }
   });
 
-  // suporte a swipe no mobile
-  var startX = 0;
-  outer.addEventListener('touchstart', function(e){ startX = e.touches[0].clientX; }, {passive:true});
-  outer.addEventListener('touchend', function(e){
-    var diff = startX - e.changedTouches[0].clientX;
-    if(Math.abs(diff) > 40){
-      if(diff > 0){ // swipe esquerda = próximo
-        var total=getTotalCards(),visible=getVisibleCount();
-        if(currentIdx < total - visible){ currentIdx++; update(); }
-      } else { // swipe direita = anterior
-        if(currentIdx > 0){ currentIdx--; update(); }
-      }
-    }
-  }, {passive:true});
-
-  // atualiza ao redimensionar
-  window.addEventListener('resize', function(){ update(); });
-
+  window.addEventListener('resize', update);
   update();
 }
 function setupCarousel(iw,pid){
@@ -1026,7 +1008,7 @@ async function refresh(){
   firstLoad=false;
 }
 refresh();
-setInterval(refresh,30000);
+// refresh automático removido — o cliente pode navegar com calma sem a página atualizar sozinha
 })();
 
 function copiarCupomBanner(btn){
