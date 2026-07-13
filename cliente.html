@@ -306,6 +306,23 @@ main{max-width:1400px;margin:0 auto;padding:48px 32px 80px;min-height:40vh;}
   text-decoration:none;position:relative;overflow:hidden;
   transition:color .35s,border-color .35s,box-shadow .35s;
 }
+
+/* Badge ESGOTADO */
+.badge-esgotado{
+  position:absolute;top:14px;left:0;z-index:4;
+  background:var(--ink);color:#fff;
+  font-family:'Jost';font-size:10px;font-weight:600;letter-spacing:.12em;
+  padding:5px 12px;text-transform:uppercase;
+}
+.card.esgotado .imgwrap img.is-active{filter:grayscale(30%);opacity:.85;}
+.card.esgotado .imgwrap::after{
+  content:'';position:absolute;inset:0;
+  background:rgba(255,255,255,.25);z-index:2;pointer-events:none;
+}
+.btn-whatsapp.disabled{
+  opacity:.45;cursor:not-allowed;pointer-events:none;
+  border-style:dashed;
+}
 .btn-whatsapp::before{
   content:'';position:absolute;inset:0;border-radius:999px;
   background:linear-gradient(135deg,var(--ink) 0%,#3a4550 100%);
@@ -913,16 +930,22 @@ function renderCatalog(){
         arrows='<button type="button" class="carousel-arrow prev">‹</button><button type="button" class="carousel-arrow next">›</button>';
         dots='<div class="carousel-dots">'+fotos.map(function(_,i){return'<span class="dot'+(i===pos?' is-active':'')+'" data-idx="'+i+'"></span>';}).join('')+'</div>';
       }
+      var esgotado = p.status === 'indisponivel';
+      if(esgotado) card.classList.add('esgotado');
+
       card.innerHTML=
-        '<div class="imgwrap" data-current="'+pos+'" data-total="'+fotos.length+'">'+imgs+arrows+dots+'</div>'+
+        '<div class="imgwrap" data-current="'+pos+'" data-total="'+fotos.length+'">'+
+          imgs+arrows+dots+
+          (esgotado ? '<span class="badge-esgotado">Esgotado</span>' : '')+
+        '</div>'+
         '<div class="body">'+
           '<span class="cat-tag">'+escapeHtml(p.categoria)+'</span>'+
           '<h3>'+escapeHtml(p.nome)+'</h3>'+
           '<div class="price"><small>R$</small>'+fmtPrice(p.preco)+'</div>'+
-          '<a href="'+gerarLink(p.nome,fmtPrice(p.preco),p.categoria)+'" target="_blank" rel="noopener" class="btn-whatsapp">'+
-            '<span class="wpp-ico">✦</span>'+
-            '<span class="wpp-txt">Pedir pelo WhatsApp</span>'+
-          '</a>'+
+          (esgotado
+            ? '<span class="btn-whatsapp disabled"><span class="wpp-ico">✕</span><span class="wpp-txt">Indisponível no momento</span></span>'
+            : '<a href="'+gerarLink(p.nome,fmtPrice(p.preco),p.categoria)+'" target="_blank" rel="noopener" class="btn-whatsapp"><span class="wpp-ico">✦</span><span class="wpp-txt">Pedir pelo WhatsApp</span></a>'
+          )+
         '</div>';
       track.appendChild(card);
       if(fotos.length>1) setupCarousel(card.querySelector('.imgwrap'),p.id);

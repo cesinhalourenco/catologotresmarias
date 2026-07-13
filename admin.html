@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel — Cadastro de Pratas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f0f10;--bg-elevated:#17181a;--card:#1c1d20;--card-border:#2c2e31;
+  --silver:#c9cdd2;--silver-bright:#eef0f2;--graphite:#3a3b3d;
+  --flame:#e8b85c;--flame-dim:#b8924a;--text-dim:#8c8f94;
+  --danger:#c0594f;--ok:#8fc99a;--radius:2px;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--silver-bright);font-family:'Jost',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;}
+h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:500;}
+
+header{padding:36px 24px 24px;text-align:center;border-bottom:1px solid var(--card-border);}
+header .eyebrow{font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--flame);margin-bottom:10px;font-weight:500;}
+header h1{font-size:clamp(28px,5vw,42px);margin:0;}
+header p{color:var(--text-dim);font-size:13px;margin:10px 0 0;}
+
+#conn-status{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--text-dim);margin-top:14px;padding:6px 14px;border:1px solid var(--card-border);border-radius:999px;}
+#conn-status .dot{width:7px;height:7px;border-radius:50%;background:var(--graphite);}
+#conn-status.online .dot{background:var(--ok);}
+#conn-status.offline .dot{background:var(--danger);}
+
+main{max-width:720px;margin:0 auto;padding:32px 24px 70px;}
+
+.panel{background:var(--bg-elevated);border:1px solid var(--card-border);border-radius:var(--radius);padding:28px 24px 30px;margin-bottom:28px;}
+.panel h2{font-size:22px;margin:0 0 4px;}
+.panel .hint{color:var(--text-dim);font-size:13px;margin:0 0 22px;}
+
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim);margin-bottom:7px;}
+.field input,.field select{width:100%;background:var(--card);border:1px solid var(--card-border);color:var(--silver-bright);padding:11px 13px;border-radius:var(--radius);font-family:'Jost';font-size:14px;outline:none;transition:border-color .15s;}
+.field input:focus,.field select:focus{border-color:var(--flame-dim);}
+.field-row{display:flex;gap:14px;}
+.field-row .field{flex:1;}
+
+.fotos-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.foto-slot{display:flex;flex-direction:column;gap:6px;}
+.foto-slot label{font-size:10px;}
+.foto-slot input[type=file]{font-size:11px;padding:8px 6px;}
+.foto-slot .mini-preview{display:none;width:100%;aspect-ratio:1/1;border-radius:var(--radius);border:1px solid var(--card-border);object-fit:cover;}
+.foto-slot .current-foto{width:100%;aspect-ratio:1/1;border-radius:var(--radius);border:1px solid var(--card-border);object-fit:cover;opacity:.7;}
+.foto-slot .foto-label-atual{font-size:9px;color:var(--text-dim);text-align:center;margin-top:2px;}
+
+.btn-primary{background:var(--silver-bright);color:var(--bg);border:none;padding:13px 22px;border-radius:var(--radius);font-family:'Jost';font-weight:500;font-size:14px;letter-spacing:.02em;cursor:pointer;transition:transform .15s,background .15s;width:100%;}
+.btn-primary:hover{background:var(--flame);}
+.btn-primary:active{transform:scale(.98);}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+
+#form-msg{margin-top:12px;font-size:13px;text-align:center;min-height:18px;}
+#form-msg.ok{color:var(--ok);}
+#form-msg.err{color:var(--danger);}
+
+.list-title{display:flex;align-items:baseline;gap:10px;margin-bottom:16px;}
+.list-title h2{font-size:20px;margin:0;}
+.list-title .count{font-size:12px;color:var(--text-dim);}
+
+.admin-row{display:flex;align-items:center;gap:14px;padding:12px 14px;background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);margin-bottom:10px;}
+.admin-row .thumb-wrap{position:relative;flex-shrink:0;}
+.admin-row img,.admin-row .ph{width:50px;height:50px;object-fit:cover;border-radius:var(--radius);background:var(--bg-elevated);flex-shrink:0;}
+.admin-row .ph{display:flex;align-items:center;justify-content:center;color:var(--graphite);font-size:9px;text-align:center;letter-spacing:.05em;}
+.admin-row .thumb-wrap .badge{position:absolute;bottom:-4px;right:-4px;background:var(--flame);color:var(--bg);font-size:9px;font-weight:600;padding:1px 4px;border-radius:8px;line-height:1.4;}
+.admin-row .info{flex:1;min-width:0;}
+.admin-row .info .n{font-size:15px;color:var(--silver-bright);}
+.admin-row .info .p{font-size:12px;color:var(--text-dim);margin-top:2px;}
+.admin-row .row-btns{display:flex;gap:6px;flex-shrink:0;}
+.admin-row .btn-edit{background:transparent;border:1px solid var(--card-border);color:var(--flame);width:32px;height:32px;border-radius:var(--radius);cursor:pointer;font-size:13px;}
+.admin-row .btn-edit:hover{border-color:var(--flame);background:rgba(232,184,92,.1);}
+.admin-row .btn-del{background:transparent;border:1px solid var(--card-border);color:var(--danger);width:32px;height:32px;border-radius:var(--radius);cursor:pointer;font-size:14px;}
+.admin-row .btn-del:hover{border-color:var(--danger);background:rgba(192,89,79,.1);}
+
+.empty-list{color:var(--text-dim);font-size:13px;text-align:center;padding:30px 0;}
+
+.link-box{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:14px 16px;font-size:13px;color:var(--text-dim);margin-top:10px;}
+.link-box code{color:var(--flame);}
+
+/* ===== MODAL DE EDIÇÃO ===== */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:var(--bg-elevated);border:1px solid var(--card-border);border-radius:4px;
+  width:100%;max-width:640px;max-height:90vh;overflow-y:auto;
+  padding:28px 24px 30px;position:relative;
+}
+.modal h2{font-size:22px;margin:0 0 4px;}
+.modal .hint{color:var(--text-dim);font-size:13px;margin:0 0 22px;}
+.modal-close{
+  position:absolute;top:16px;right:16px;background:transparent;border:1px solid var(--card-border);
+  color:var(--text-dim);width:30px;height:30px;border-radius:var(--radius);cursor:pointer;font-size:16px;
+}
+.modal-close:hover{border-color:var(--silver);color:var(--silver-bright);}
+
+#edit-msg{margin-top:12px;font-size:13px;text-align:center;min-height:18px;}
+#edit-msg.ok{color:var(--ok);}
+#edit-msg.err{color:var(--danger);}
+
+.fotos-edit-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.foto-edit-slot{display:flex;flex-direction:column;gap:5px;}
+.foto-edit-slot label{font-size:10px;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;}
+.foto-edit-slot .current{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:var(--radius);border:1px solid var(--card-border);opacity:.8;}
+.foto-edit-slot .current-label{font-size:9px;color:var(--text-dim);text-align:center;}
+.foto-edit-slot input[type=file]{font-size:10px;padding:6px 4px;background:var(--card);border:1px solid var(--card-border);color:var(--silver);border-radius:var(--radius);}
+.foto-edit-slot .new-preview{display:none;width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:var(--radius);border:2px solid var(--ok);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Painel interno</div>
+  <h1>Cadastro de Pratas</h1>
+  <p>Toda peça adicionada aqui aparece automaticamente no catálogo do cliente.</p>
+  <div id="conn-status"><span class="dot"></span><span id="conn-text">Verificando conexão com a API...</span></div>
+</header>
+
+<main>
+  <!-- FORMULÁRIO DE NOVA PEÇA -->
+  <div class="panel">
+    <h2>Nova peça</h2>
+    <p class="hint">Preencha os dados e envie as 4 fotos da peça — ao salvar, ela já fica disponível no catálogo do cliente com um carrossel de fotos.</p>
+    <form id="product-form">
+      <div class="field">
+        <label for="f-nome">Nome da peça</label>
+        <input id="f-nome" type="text" placeholder="Ex: Anel Solitário Zircônia" required maxlength="80">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="f-preco">Preço (R$)</label>
+          <input id="f-preco" type="number" step="0.01" min="0" placeholder="Ex: 89.90" required>
+        </div>
+        <div class="field">
+          <label for="f-categoria">Categoria</label>
+          <select id="f-categoria">
+            <option value="Anéis">Anéis</option>
+            <option value="Colares">Colares</option>
+            <option value="Brincos">Brincos</option>
+            <option value="Pulseiras">Pulseiras</option>
+            <option value="Pingentes">Pingentes</option>
+            <option value="Outros">Outros</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Fotos da peça (4 fotos obrigatórias)</label>
+        <div class="fotos-grid">
+          <div class="foto-slot">
+            <label for="f-foto-1">Foto 1</label>
+            <input id="f-foto-1" type="file" accept="image/png,image/jpeg,image/webp,image/gif" required>
+            <img class="mini-preview" id="preview-1" alt="">
+          </div>
+          <div class="foto-slot">
+            <label for="f-foto-2">Foto 2</label>
+            <input id="f-foto-2" type="file" accept="image/png,image/jpeg,image/webp,image/gif" required>
+            <img class="mini-preview" id="preview-2" alt="">
+          </div>
+          <div class="foto-slot">
+            <label for="f-foto-3">Foto 3</label>
+            <input id="f-foto-3" type="file" accept="image/png,image/jpeg,image/webp,image/gif" required>
+            <img class="mini-preview" id="preview-3" alt="">
+          </div>
+          <div class="foto-slot">
+            <label for="f-foto-4">Foto 4</label>
+            <input id="f-foto-4" type="file" accept="image/png,image/jpeg,image/webp,image/gif" required>
+            <img class="mini-preview" id="preview-4" alt="">
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary" id="submit-btn">Adicionar ao catálogo</button>
+      <div id="form-msg"></div>
+    </form>
+  </div>
+
+  <!-- LISTA DE PEÇAS -->
+  <div class="panel">
+    <div class="list-title">
+      <h2>Peças cadastradas</h2>
+      <span class="count" id="list-count"></span>
+    </div>
+    <div id="admin-list-items"></div>
+  </div>
+
+  <div class="link-box">
+    Catálogo público: <code>tresmariasjoias.up.railway.app</code>
+  </div>
+</main>
+
+<!-- MODAL DE EDIÇÃO -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="fecharModal()">✕</button>
+    <h2>Editar peça</h2>
+    <p class="hint">Altere o que quiser — deixe os campos de foto vazios para manter as fotos atuais. Só envie uma nova foto no slot que quiser substituir.</p>
+
+    <form id="edit-form">
+      <input type="hidden" id="edit-id">
+      <div class="field">
+        <label for="edit-nome">Nome da peça</label>
+        <input id="edit-nome" type="text" required maxlength="80">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="edit-preco">Preço (R$)</label>
+          <input id="edit-preco" type="number" step="0.01" min="0" required>
+        </div>
+        <div class="field">
+          <label for="edit-categoria">Categoria</label>
+          <select id="edit-categoria">
+            <option value="Anéis">Anéis</option>
+            <option value="Colares">Colares</option>
+            <option value="Brincos">Brincos</option>
+            <option value="Pulseiras">Pulseiras</option>
+            <option value="Pingentes">Pingentes</option>
+            <option value="Outros">Outros</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Fotos — envie nova foto para substituir (opcional por slot)</label>
+        <div class="fotos-edit-grid" id="edit-fotos-grid">
+          <!-- preenchido dinamicamente -->
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary" id="edit-submit-btn">Salvar alterações</button>
+      <div id="edit-msg"></div>
+    </form>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+var API_URL = "https://tresmariasjoias.up.railway.app/api";
+
+// ===== CONEXÃO =====
+function setStatus(online, msg){
+  var el=document.getElementById('conn-status'),text=document.getElementById('conn-text');
+  el.className=online?'online':'offline';text.textContent=msg;
+}
+async function checkConnection(){
+  try{
+    var r=await fetch(API_URL+'/status');
+    if(!r.ok) throw new Error();
+    setStatus(true,'API conectada — tudo sincronizado');return true;
+  }catch(e){
+    setStatus(false,'Não foi possível conectar à API.');return false;
+  }
+}
+
+function escapeHtml(str){var d=document.createElement('div');d.textContent=str;return d.innerHTML;}
+function fmtPrice(v){return Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+
+// ===== LISTA =====
+async function loadList(){
+  var wrap=document.getElementById('admin-list-items');
+  var countEl=document.getElementById('list-count');
+  try{
+    var r=await fetch(API_URL+'/produtos');
+    if(!r.ok) throw new Error();
+    var produtos=await r.json();
+    countEl.textContent=produtos.length+(produtos.length===1?' peça':' peças');
+    if(produtos.length===0){wrap.innerHTML='<div class="empty-list">Nenhuma peça cadastrada ainda.</div>';return;}
+    wrap.innerHTML='';
+    produtos.forEach(function(p){
+      var row=document.createElement('div');row.className='admin-row';
+      var fotos=p.fotos||(p.foto?[p.foto]:[]);
+      var thumbHtml=fotos.length
+        ?'<div class="thumb-wrap"><img src="'+fotos[0]+'" alt=""><span class="badge">'+fotos.length+'</span></div>'
+        :'<div class="ph">sem foto</div>';
+      row.innerHTML=
+        thumbHtml+
+        '<div class="info">'+
+          '<div class="n">'+escapeHtml(p.nome)+'</div>'+
+          '<div class="p">'+escapeHtml(p.categoria)+' · R$ '+fmtPrice(p.preco)+'</div>'+
+        '</div>'+
+        '<div class="row-btns">'+
+          '<button type="button" class="btn-edit" data-id="'+p.id+'" title="Editar peça">✎</button>'+
+          '<button type="button" class="btn-del" data-id="'+p.id+'" title="Remover">✕</button>'+
+        '</div>';
+      wrap.appendChild(row);
+    });
+
+    // botões de editar
+    wrap.querySelectorAll('.btn-edit').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var id=btn.getAttribute('data-id');
+        var prod=produtos.find(function(p){return String(p.id)===String(id);});
+        if(prod) abrirModal(prod);
+      });
+    });
+
+    // botões de remover
+    wrap.querySelectorAll('.btn-del').forEach(function(btn){
+      btn.addEventListener('click',async function(){
+        if(!confirm('Remover esta peça do catálogo?')) return;
+        btn.disabled=true;
+        try{
+          var r=await fetch(API_URL+'/produtos/'+btn.getAttribute('data-id'),{method:'DELETE'});
+          if(!r.ok) throw new Error();
+          loadList();
+        }catch(e){
+          alert('Não foi possível remover. Verifique a conexão.');
+          btn.disabled=false;
+        }
+      });
+    });
+
+  }catch(e){
+    wrap.innerHTML='<div class="empty-list">Não foi possível carregar as peças. Verifique se a API está rodando.</div>';
+    countEl.textContent='';
+  }
+}
+
+// ===== MODAL =====
+window.abrirModal = function(prod){
+  document.getElementById('edit-id').value=prod.id;
+  document.getElementById('edit-nome').value=prod.nome;
+  document.getElementById('edit-preco').value=prod.preco;
+  document.getElementById('edit-categoria').value=prod.categoria;
+
+  var fotos=prod.fotos||(prod.foto?[prod.foto]:[]);
+  var grid=document.getElementById('edit-fotos-grid');
+  grid.innerHTML='';
+
+  for(var i=0;i<4;i++){
+    var slot=document.createElement('div');slot.className='foto-edit-slot';
+    var fotoAtual=fotos[i]||'';
+    var slotNum=i+1;
+    slot.innerHTML=
+      '<label>Foto '+slotNum+'</label>'+
+      (fotoAtual?'<img class="current" src="'+fotoAtual+'" alt="foto '+slotNum+'"><div class="current-label">atual</div>':'')+
+      '<input type="file" id="edit-foto-'+slotNum+'" accept="image/png,image/jpeg,image/webp,image/gif" data-slot="'+i+'">'+
+      '<img class="new-preview" id="edit-preview-'+slotNum+'" alt="">';
+    grid.appendChild(slot);
+
+    // preview ao selecionar nova foto
+    (function(n){
+      var inp=document.getElementById('edit-foto-'+n);
+      var prev=document.getElementById('edit-preview-'+n);
+      inp.addEventListener('change',function(){
+        if(!this.files[0]){prev.style.display='none';prev.src='';return;}
+        var reader=new FileReader();
+        reader.onload=function(e){prev.src=e.target.result;prev.style.display='block';};
+        reader.readAsDataURL(this.files[0]);
+      });
+    })(slotNum);
+  }
+
+  setEditMsg('','');
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+};
+
+window.fecharModal = function(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow='';
+};
+
+// fechar ao clicar fora do modal
+document.getElementById('modal-overlay').addEventListener('click',function(e){
+  if(e.target===this) fecharModal();
+});
+
+// ===== SALVAR EDIÇÃO =====
+function setEditMsg(text,type){
+  var el=document.getElementById('edit-msg');el.textContent=text;el.className=type||'';
+}
+
+document.getElementById('edit-form').addEventListener('submit',async function(e){
+  e.preventDefault();
+  var btn=document.getElementById('edit-submit-btn');
+  var id=document.getElementById('edit-id').value;
+  var nome=document.getElementById('edit-nome').value.trim();
+  var preco=document.getElementById('edit-preco').value;
+  var categoria=document.getElementById('edit-categoria').value;
+
+  if(!nome){setEditMsg('Digite o nome da peça.','err');return;}
+  if(isNaN(parseFloat(preco))||parseFloat(preco)<0){setEditMsg('Digite um preço válido.','err');return;}
+
+  btn.disabled=true;setEditMsg('Salvando...','');
+
+  var formData=new FormData();
+  formData.append('nome',nome);
+  formData.append('preco',preco);
+  formData.append('categoria',categoria);
+
+  // só envia as fotos que foram selecionadas
+  var temNovaFoto=false;
+  for(var i=1;i<=4;i++){
+    var inp=document.getElementById('edit-foto-'+i);
+    if(inp&&inp.files[0]){
+      formData.append('fotos',inp.files[0]);
+      temNovaFoto=true;
+    }
+  }
+
+  try{
+    var r=await fetch(API_URL+'/produtos/'+id,{method:'PUT',body:formData});
+    var data=await r.json();
+    if(!r.ok) throw new Error(data.erro||'Erro ao salvar.');
+    setEditMsg('Peça atualizada com sucesso!','ok');
+    loadList();
+    setTimeout(function(){fecharModal();},1200);
+  }catch(err){
+    setEditMsg(err.message||'Não foi possível salvar. Verifique a conexão.','err');
+  }finally{
+    btn.disabled=false;
+  }
+});
+
+// ===== PREVIEWS FORMULÁRIO NOVO =====
+[1,2,3,4].forEach(function(n){
+  document.getElementById('f-foto-'+n).addEventListener('change',function(){
+    var img=document.getElementById('preview-'+n);
+    if(!this.files[0]){img.style.display='none';img.src='';return;}
+    var reader=new FileReader();
+    reader.onload=function(e){img.src=e.target.result;img.style.display='block';};
+    reader.readAsDataURL(this.files[0]);
+  });
+});
+
+// ===== FORM NOVO =====
+function setMsg(text,type){var el=document.getElementById('form-msg');el.textContent=text;el.className=type||'';}
+
+document.getElementById('product-form').addEventListener('submit',async function(e){
+  e.preventDefault();
+  var btn=document.getElementById('submit-btn');
+  var nome=document.getElementById('f-nome').value.trim();
+  var preco=document.getElementById('f-preco').value;
+  var categoria=document.getElementById('f-categoria').value;
+  var inputs=[1,2,3,4].map(function(n){return document.getElementById('f-foto-'+n);});
+
+  if(!nome){setMsg('Digite o nome da peça.','err');return;}
+  if(isNaN(parseFloat(preco))||parseFloat(preco)<0){setMsg('Digite um preço válido.','err');return;}
+  if(inputs.some(function(inp){return !inp.files[0];})){setMsg('Envie as 4 fotos da peça antes de salvar.','err');return;}
+
+  btn.disabled=true;setMsg('Salvando...','');
+
+  var formData=new FormData();
+  formData.append('nome',nome);formData.append('preco',preco);formData.append('categoria',categoria);
+  inputs.forEach(function(inp){formData.append('fotos',inp.files[0]);});
+
+  try{
+    var r=await fetch(API_URL+'/produtos',{method:'POST',body:formData});
+    var data=await r.json();
+    if(!r.ok) throw new Error(data.erro||'Erro ao salvar.');
+    setMsg('Peça adicionada ao catálogo.','ok');
+    this.reset();
+    [1,2,3,4].forEach(function(n){var img=document.getElementById('preview-'+n);img.style.display='none';img.src='';});
+    loadList();
+    setTimeout(function(){setMsg('','');},2500);
+  }catch(err){
+    setMsg(err.message||'Não foi possível salvar.','err');
+  }finally{
+    btn.disabled=false;
+  }
+});
+
+// ===== INIT =====
+checkConnection().then(function(ok){if(ok)loadList();});
+setInterval(checkConnection,8000);
+})();
+</script>
+</body>
+</html>
