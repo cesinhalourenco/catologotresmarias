@@ -111,6 +111,7 @@ const produtoSchema = new mongoose.Schema({
   preco: { type: Number, required: true },
   categoria: { type: String, required: true },
   fotos: { type: [String], default: [] }, // URLs do Cloudinary
+  status: { type: String, default: 'disponivel', enum: ['disponivel','indisponivel'] },
   criado_em: { type: Date, default: Date.now }
 });
 
@@ -195,7 +196,8 @@ app.post('/api/produtos', uploadFotos, async (req, res) => {
       nome: nome.trim(),
       preco: precoNum,
       categoria: categoria.trim(),
-      fotos: fotosUrls
+      fotos: fotosUrls,
+      status: req.body.status === 'indisponivel' ? 'indisponivel' : 'disponivel'
     });
 
     res.status(201).json(formatarProduto(novo));
@@ -255,6 +257,9 @@ app.put('/api/produtos/:id', uploadFotos, async (req, res) => {
     existente.preco = preco !== undefined ? parseFloat(preco) : existente.preco;
     existente.categoria = categoria !== undefined ? categoria.trim() : existente.categoria;
     existente.fotos = fotosAtuais;
+    if (req.body.status !== undefined) {
+      existente.status = req.body.status === 'indisponivel' ? 'indisponivel' : 'disponivel';
+    }
     await existente.save();
 
     res.json(formatarProduto(existente));
@@ -281,9 +286,8 @@ function formatarProduto(row) {
     preco: row.preco,
     categoria: row.categoria,
     fotos: row.fotos || [],
-    // mantém "foto" (primeira da lista) por compatibilidade com qualquer
-    // código antigo que ainda espere esse campo
     foto: (row.fotos && row.fotos[0]) || null,
+    status: row.status || 'disponivel',
     criado_em: row.criado_em
   };
 }
