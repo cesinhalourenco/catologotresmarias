@@ -309,15 +309,18 @@ main{max-width:1400px;margin:0 auto;padding:48px 32px 80px;min-height:40vh;}
 
 /* Badge ESGOTADO */
 .badge-esgotado{
-  position:absolute;top:14px;left:0;z-index:4;
+  position:absolute;top:12px;left:12px;z-index:10;
   background:var(--ink);color:#fff;
-  font-family:'Jost';font-size:10px;font-weight:600;letter-spacing:.12em;
+  font-family:'Jost';font-size:10px;font-weight:700;letter-spacing:.14em;
   padding:5px 12px;text-transform:uppercase;
+  border-radius:2px;
+  box-shadow:0 2px 8px rgba(0,0,0,.2);
 }
-.card.esgotado .imgwrap img.is-active{filter:grayscale(30%);opacity:.85;}
+.card.esgotado{position:relative;}
+.card.esgotado .imgwrap img.is-active{filter:grayscale(40%);opacity:.8;}
 .card.esgotado .imgwrap::after{
   content:'';position:absolute;inset:0;
-  background:rgba(255,255,255,.25);z-index:2;pointer-events:none;
+  background:rgba(255,255,255,.2);z-index:2;pointer-events:none;
 }
 .btn-whatsapp.disabled{
   opacity:.45;cursor:not-allowed;pointer-events:none;
@@ -934,9 +937,9 @@ function renderCatalog(){
       if(esgotado) card.classList.add('esgotado');
 
       card.innerHTML=
+        (esgotado ? '<span class="badge-esgotado">Esgotado</span>' : '')+
         '<div class="imgwrap" data-current="'+pos+'" data-total="'+fotos.length+'">'+
           imgs+arrows+dots+
-          (esgotado ? '<span class="badge-esgotado">Esgotado</span>' : '')+
         '</div>'+
         '<div class="body">'+
           '<span class="cat-tag">'+escapeHtml(p.categoria)+'</span>'+
