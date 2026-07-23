@@ -1126,6 +1126,14 @@ function renderCatalog(){
   if(visible.length===0){main.innerHTML='<div class="empty"><div class="display">Nada em "'+escapeHtml(activeFilter)+'"</div><p>Ainda não há peças cadastradas nessa categoria.</p></div>';return;}
   var groups={};
   visible.forEach(function(p){if(!groups[p.categoria])groups[p.categoria]=[];groups[p.categoria].push(p);});
+  // disponíveis primeiro, esgotados por último dentro de cada categoria
+  Object.keys(groups).forEach(function(cat){
+    groups[cat].sort(function(a,b){
+      var aEsg = a.status === 'indisponivel' ? 1 : 0;
+      var bEsg = b.status === 'indisponivel' ? 1 : 0;
+      return aEsg - bEsg;
+    });
+  });
   CATEGORY_ORDER.filter(function(c){return groups[c];}).forEach(function(cat){
     var block=document.createElement('section');block.className='category-block reveal';
 
