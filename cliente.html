@@ -227,7 +227,123 @@ main{max-width:1400px;margin:0 auto;padding:48px 32px 80px;min-height:40vh;}
 @keyframes glint{from{background-position:120% 0;}to{background-position:-20% 0;}}
 @media(prefers-reduced-motion:reduce){.card:hover::before{animation:none;opacity:0;}}
 
-/* ===== MOBILE: 2 colunas, sem carrossel, scroll direto ===== */
+/* ===== PÁGINA DE PRODUTO ===== */
+#produto-page{
+  display:none;position:fixed;inset:0;z-index:500;
+  background:var(--bg);overflow-y:auto;
+}
+#produto-page.open{display:block;}
+
+.prod-nav{
+  position:sticky;top:0;z-index:10;
+  background:rgba(189,214,232,.95);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--card-border);
+  padding:0 32px;height:60px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.prod-back{
+  display:flex;align-items:center;gap:8px;
+  background:none;border:none;cursor:pointer;
+  color:var(--ink-soft);font-family:'Jost';font-size:12px;
+  letter-spacing:.08em;text-transform:uppercase;
+  transition:color .2s;padding:0;
+}
+.prod-back:hover{color:var(--ink);}
+.prod-back .arrow{
+  width:28px;height:28px;border-radius:50%;border:1px solid var(--card-border);
+  display:flex;align-items:center;justify-content:center;font-size:14px;
+  transition:border-color .2s,background .2s;
+}
+.prod-back:hover .arrow{border-color:var(--ink);background:var(--ink);color:#fff;}
+.prod-nav-brand{
+  font-family:'Cormorant Garamond',serif;font-size:18px;
+  letter-spacing:.06em;color:var(--ink);
+}
+
+.prod-inner{
+  max-width:1100px;margin:0 auto;
+  padding:48px 32px 80px;
+  display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;
+}
+@media(max-width:768px){
+  .prod-inner{grid-template-columns:1fr;gap:32px;padding:28px 16px 60px;}
+  .prod-nav{padding:0 16px;}
+}
+
+/* galeria de fotos */
+.prod-gallery{}
+.prod-main-img{
+  width:100%;aspect-ratio:1/1;background:#f5f5f5;
+  border:1px solid var(--card-border);overflow:hidden;
+  position:relative;margin-bottom:12px;
+}
+.prod-main-img img{
+  width:100%;height:100%;object-fit:cover;
+  transition:opacity .3s ease;
+}
+.prod-thumbs{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
+}
+.prod-thumb{
+  aspect-ratio:1/1;border:2px solid transparent;cursor:pointer;
+  background:#f5f5f5;overflow:hidden;transition:border-color .2s;
+}
+.prod-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .3s;}
+.prod-thumb:hover img{transform:scale(1.05);}
+.prod-thumb.active{border-color:var(--ink);}
+
+/* info da peça */
+.prod-info{}
+.prod-cat{
+  font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:10px;display:block;
+}
+.prod-nome{
+  font-size:clamp(28px,4vw,42px);color:var(--ink);
+  line-height:1.1;margin-bottom:20px;
+}
+.prod-divider{height:1px;background:var(--card-border);margin-bottom:20px;}
+.prod-preco{
+  font-family:'Jost';font-size:32px;font-weight:500;
+  color:var(--ink);margin-bottom:6px;
+}
+.prod-preco small{font-size:16px;color:var(--ink-faint);font-weight:400;margin-right:3px;}
+.prod-preco-sub{font-size:13px;color:var(--ink-soft);margin-bottom:32px;}
+
+.prod-badge-esgotado{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(74,85,96,.08);border:1px solid var(--card-border);
+  color:var(--ink-soft);font-size:12px;letter-spacing:.08em;
+  padding:10px 18px;margin-bottom:32px;
+}
+
+.prod-btn-wpp{
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  width:100%;padding:17px 24px;
+  background:var(--ink);color:#fff;border:none;cursor:pointer;
+  font-family:'Jost';font-size:13px;font-weight:500;letter-spacing:.1em;
+  text-transform:uppercase;text-decoration:none;
+  transition:background .25s,transform .15s,box-shadow .25s;
+  margin-bottom:14px;
+}
+.prod-btn-wpp:hover{background:var(--gold);transform:translateY(-2px);box-shadow:0 8px 24px rgba(138,116,88,.3);}
+
+.prod-garantias{
+  display:flex;flex-direction:column;gap:10px;
+  border-top:1px solid var(--card-border);padding-top:24px;margin-top:8px;
+}
+.prod-garantia{
+  display:flex;align-items:center;gap:12px;
+  font-size:13px;color:var(--ink-soft);
+}
+.prod-garantia .icon{font-size:16px;flex-shrink:0;}
+
+/* zoom na foto principal ao passar o mouse */
+@media(hover:hover){
+  .prod-main-img{cursor:zoom-in;overflow:hidden;}
+  .prod-main-img img{transition:transform .4s ease,opacity .3s ease;}
+  .prod-main-img:hover img{transform:scale(1.08);}
+}
 @media(max-width:700px){
   main{padding:20px 0 60px;}
   .category-block{margin-bottom:40px;}
@@ -493,6 +609,46 @@ footer{background:var(--ink);color:rgba(255,255,255,.55);padding:56px 24px 32px;
 </style>
 </head>
 <body>
+
+<!-- PÁGINA DE PRODUTO -->
+<div id="produto-page">
+  <div class="prod-nav">
+    <button class="prod-back" onclick="voltarCatalogo()">
+      <span class="arrow">←</span>
+      <span>Voltar ao catálogo</span>
+    </button>
+    <div class="prod-nav-brand">Três Marias</div>
+    <div style="width:120px"></div>
+  </div>
+  <div class="prod-inner">
+    <!-- GALERIA -->
+    <div class="prod-gallery">
+      <div class="prod-main-img" id="prod-main-img">
+        <img id="prod-foto-principal" src="" alt="">
+      </div>
+      <div class="prod-thumbs" id="prod-thumbs"></div>
+    </div>
+    <!-- INFO -->
+    <div class="prod-info">
+      <span class="prod-cat" id="prod-cat"></span>
+      <h1 class="prod-nome" id="prod-nome"></h1>
+      <div class="prod-divider"></div>
+      <div class="prod-preco" id="prod-preco"></div>
+      <div class="prod-preco-sub">À vista no WhatsApp</div>
+      <div id="prod-status-wrap"></div>
+      <a id="prod-btn-wpp" href="#" target="_blank" rel="noopener" class="prod-btn-wpp">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.115.549 4.1 1.508 5.83L.057 23.25a.75.75 0 0 0 .916.919l5.487-1.438A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.696 9.696 0 0 1-4.953-1.355l-.355-.211-3.676.963.981-3.584-.232-.369A9.696 9.696 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/></svg>
+        Pedir pelo WhatsApp
+      </a>
+      <div class="prod-garantias">
+        <div class="prod-garantia"><span class="icon">✦</span><span>Prata 925 certificada</span></div>
+        <div class="prod-garantia"><span class="icon">📦</span><span>Entrega para todo o Brasil</span></div>
+        <div class="prod-garantia"><span class="icon">↩</span><span>Troca em até 7 dias</span></div>
+        <div class="prod-garantia"><span class="icon">💬</span><span>Atendimento pelo WhatsApp</span></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- TICKER -->
 <div class="ticker-wrap">
@@ -810,6 +966,76 @@ for(var k=0;k<3;k++){
 }
 track.innerHTML = html;
 
+// ===== PÁGINA DE PRODUTO =====
+var WHATSAPP_NUM = '5563992082522';
+
+window.abrirProduto = function(p){
+  var page = document.getElementById('produto-page');
+  var fotos = p.fotos && p.fotos.length ? p.fotos : (p.foto ? [p.foto] : []);
+  var esgotado = p.status === 'indisponivel';
+
+  // foto principal
+  var fotoEl = document.getElementById('prod-foto-principal');
+  fotoEl.src = fotos[0] || '';
+  fotoEl.alt = p.nome;
+
+  // miniaturas
+  var thumbsEl = document.getElementById('prod-thumbs');
+  thumbsEl.innerHTML = '';
+  fotos.forEach(function(url, i){
+    var thumb = document.createElement('div');
+    thumb.className = 'prod-thumb' + (i === 0 ? ' active' : '');
+    thumb.innerHTML = '<img src="'+url+'" alt="foto '+(i+1)+'">';
+    thumb.addEventListener('click', function(){
+      fotoEl.src = url;
+      thumbsEl.querySelectorAll('.prod-thumb').forEach(function(t){ t.classList.remove('active'); });
+      thumb.classList.add('active');
+    });
+    thumbsEl.appendChild(thumb);
+  });
+
+  // info
+  document.getElementById('prod-cat').textContent = p.categoria;
+  document.getElementById('prod-nome').textContent = p.nome;
+  document.getElementById('prod-preco').innerHTML = '<small>R$</small>' + Number(p.preco).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  // status
+  var statusWrap = document.getElementById('prod-status-wrap');
+  var btnWpp = document.getElementById('prod-btn-wpp');
+  if(esgotado){
+    statusWrap.innerHTML = '<div class="prod-badge-esgotado">⊗ Peça indisponível no momento</div>';
+    btnWpp.style.opacity = '.4';
+    btnWpp.style.pointerEvents = 'none';
+    btnWpp.style.background = 'var(--ink-soft)';
+    btnWpp.textContent = 'Indisponível no momento';
+  } else {
+    statusWrap.innerHTML = '';
+    btnWpp.style.opacity = '1';
+    btnWpp.style.pointerEvents = 'auto';
+    btnWpp.style.background = '';
+    btnWpp.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.115.549 4.1 1.508 5.83L.057 23.25a.75.75 0 0 0 .916.919l5.487-1.438A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.696 9.696 0 0 1-4.953-1.355l-.355-.211-3.676.963.981-3.584-.232-.369A9.696 9.696 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/></svg>Pedir pelo WhatsApp';
+    var msg = 'Olá! Vi o catálogo das *Três Marias* e tenho interesse na peça:\n\n*'+p.nome+'*\nCategoria: '+p.categoria+'\nValor: R$ '+Number(p.preco).toLocaleString('pt-BR',{minimumFractionDigits:2})+'\n\nPoderia me dar mais informações? 😊';
+    btnWpp.href = 'https://wa.me/'+WHATSAPP_NUM+'?text='+encodeURIComponent(msg);
+  }
+
+  // abrir página e rolar para o topo
+  page.classList.add('open');
+  page.scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+  // bloqueia scroll mas permite scroll interno da página de produto
+  document.body.style.overflow = '';
+  page.style.overflowY = 'auto';
+};
+
+window.voltarCatalogo = function(){
+  document.getElementById('produto-page').classList.remove('open');
+};
+
+// fechar com tecla ESC
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape') voltarCatalogo();
+});
+
 // ===== PARTÍCULAS =====
 (function(){
   var c = document.getElementById('particles');
@@ -935,6 +1161,14 @@ function renderCatalog(){
       }
       var esgotado = p.status === 'indisponivel';
       if(esgotado) card.classList.add('esgotado');
+
+      // card clicável para abrir página de produto
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', function(e){
+        // não abre se clicou no botão de WhatsApp ou setas do carrossel
+        if(e.target.closest('.btn-whatsapp') || e.target.closest('.carousel-arrow') || e.target.closest('.carousel-dots')) return;
+        abrirProduto(p);
+      });
 
       card.innerHTML=
         (esgotado ? '<span class="badge-esgotado">Esgotado</span>' : '')+
